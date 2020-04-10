@@ -428,7 +428,7 @@ namespace Xamarin.Android.LiveChat
                 string uriString = uri.ToString();
                 if (uriString.StartsWith("tel:"))
                 {
-                    Intent i = new Intent(Intent.ActionCall, uri);
+                    Intent i = new Intent(Intent.ActionDial, uri);
                     instance.StartActivity(i);
                     return true;
                 }
