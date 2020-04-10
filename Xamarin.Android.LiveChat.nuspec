@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Xamarin.Android.LiveChat</id>
-    <version>$version$</version>
+    <version>1.0.0</version>
     <title>Xamarin.Android.LiveChat</title>
     <authors>Abner Benavides</authors>
     <owners>Abner Benavides</owners>
@@ -20,6 +20,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\package\Xamarin.Android.LiveChat.*" target="lib\MonoAndroid80" />
+    <!-- Android reference assemblies -->
+    <file src="Xamarin.Android.LiveChat\bin\Release\Xamarin.Android.LiveChat.dll" target="lib\MonoAndroid80\Xamarin.Android.LiveChat.dll" />
+    <file src="Xamarin.Android.LiveChat\bin/Release\Xamarin.Android.LiveChat.pdb" target="lib\MonoAndroid80\Xamarin.Android.LiveChat.pdb" />
   </files>
 </package>
