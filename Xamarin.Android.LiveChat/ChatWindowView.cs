@@ -1,4 +1,8 @@
 ﻿using System.Text.RegularExpressions;
+
+using Java.IO;
+using Java.Lang;
+
 using Android.App;
 using Android.Content;
 using Android.Net;
@@ -7,12 +11,13 @@ using Android.Util;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
-using Java.IO;
-using Java.Lang;
-using Xamarin.Android.LiveChat.Interfaces;
-using Xamarin.Android.LiveChat.Model;
+
 using static Android.Views.View;
 using AndroidResources = Android;
+using IValueCB = Android.Webkit.IValueCallback;
+
+using Xamarin.Android.LiveChat.Interfaces;
+using Xamarin.Android.LiveChat.Model;
 
 namespace Xamarin.Android.LiveChat
 {
@@ -29,8 +34,8 @@ namespace Xamarin.Android.LiveChat
         internal static readonly int REQUEST_CODE_FILE_UPLOAD = 21354;
         internal static readonly string TARGET_URL_PREFIX = "secure.livechatinc.com";
 
-        private IValueCallBack<Uri> mUriUploadCallback;
-        private IValueCallBack<Uri[]> mUriArrayUploadCallback;
+        private IValueCB mUriUploadCallback;
+        private IValueCB mUriArrayUploadCallback;
         private ChatWindowConfiguration config;
         private bool initialized;
         private static Activity _activity;
@@ -38,7 +43,7 @@ namespace Xamarin.Android.LiveChat
         public static ChatWindowView CreateAndAttachedChatWindowInstance(Activity activity)
         {
             _activity = activity;
-            activity.Window.SetSoftInputMode(SoftInput.AdjustResize | SoftInput.StateHidden); 
+            activity.Window.SetSoftInputMode(SoftInput.AdjustResize | SoftInput.StateHidden);
             ViewGroup contentView = (ViewGroup)activity.Window.DecorView.FindViewById(AndroidResources.Resource.Id.Content);
             var chatWindow = (ChatWindowView)LayoutInflater.From(activity).Inflate(Resource.Layout.view_chat_window, contentView, false);
             contentView.AddView(chatWindow, ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
@@ -87,7 +92,7 @@ namespace Xamarin.Android.LiveChat
             webSettings.SetSupportMultipleWindows(true);
 
             webView.SetWebViewClient(new LCWebViewClient());
-            webView.SetWebChromeClient(new LCWebChromeClient());
+            webView.SetWebChromeClient(new LCWebChromeClient(this));
             webView.RequestFocus(FocusSearchDirection.Down);
             webView.Visibility = ViewStates.Gone;
 
@@ -97,7 +102,7 @@ namespace Xamarin.Android.LiveChat
 
         internal void OnUiReady()
         {
-            Post(() => 
+            Post(() =>
             {
                 HideProgressBar();
             });
@@ -257,14 +262,14 @@ namespace Xamarin.Android.LiveChat
             mUriUploadCallback = null;
         }
 
-        private void ChooseUriToUpload(IValueCallBack<Uri> uriValueCallback)
+        private void ChooseUriToUpload(IValueCB uriValueCallback)
         {
             ResetAllUploadCallbacks();
             mUriUploadCallback = uriValueCallback;
             StartFileChooserActivity();
         }
 
-        private void ChooseUriArrayToUpload(IValueCallBack<Uri[]> uriArrayValueCallback)
+        private void ChooseUriArrayToUpload(IValueCB uriArrayValueCallback)
         {
             ResetAllUploadCallbacks();
             mUriArrayUploadCallback = uriArrayValueCallback;
@@ -338,6 +343,13 @@ namespace Xamarin.Android.LiveChat
 
         protected class LCWebChromeClient : WebChromeClient
         {
+            private ChatWindowView ChatWindow = null;
+
+            public LCWebChromeClient(ChatWindowView ChatWindow) : base()
+            {
+                this.ChatWindow = ChatWindow;
+            }
+
             public override bool OnCreateWindow(WebView view, bool isDialog, bool isUserGesture, Message resultMsg)
             {
                 webViewPopup = new WebView(instance)
@@ -356,6 +368,12 @@ namespace Xamarin.Android.LiveChat
                 transport.WebView = webViewPopup;
                 resultMsg.SendToTarget();
 
+                return true;
+            }
+
+            public override bool OnShowFileChooser(WebView webView, IValueCB uploadMsg, FileChooserParams fileChooserParams)
+            {
+                ChatWindow.ChooseUriArrayToUpload(uploadMsg);
                 return true;
             }
         }
@@ -408,6 +426,13 @@ namespace Xamarin.Android.LiveChat
             private bool HandleUri(WebView view, Uri uri)
             {
                 string uriString = uri.ToString();
+                if (uriString.StartsWith("tel:"))
+                {
+                    Intent i = new Intent(Intent.ActionCall, uri);
+                    instance.StartActivity(i);
+                    return true;
+                }
+
                 string host = uri.Host;
                 bool facebookLogin = Regex.IsMatch(uriString, facebookPattern);
                 bool liveChat = Regex.IsMatch(uriString, Pattern);
@@ -427,11 +452,6 @@ namespace Xamarin.Android.LiveChat
                 return true;
             }
         }
-    }
-
-    public interface IValueCallBack<T>
-    {
-        void OnReceiveValue(T value);
     }
 
     public class OnTouchListener : Java.Lang.Object, IOnTouchListener
