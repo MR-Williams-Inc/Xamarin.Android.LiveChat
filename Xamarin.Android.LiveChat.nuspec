@@ -1,16 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Xamarin.Android.LiveChat</id>
+    <id>LiveChat</id>
     <version>1.0.0</version>
-    <title>Xamarin.Android.LiveChat</title>
+    <title>LiveChat</title>
     <authors>Abner Benavides</authors>
     <owners>Abner Benavides</owners>
+    <licenseUrl>https://github.com/abner86/Xamarin.Android.LiveChat/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <projectUrl>https://github.com/abner86/Xamarin.Android.LiveChat</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/abner86/Xamarin.Android.LiveChat/master/live-chat-icon.png</iconUrl>
+    <projectUrl>https://github.com/MR-Williams-Inc/Xamarin.Android.LiveChat</projectUrl>
+    <iconUrl>https://github.com/MR-Williams-Inc/Xamarin.Android.LiveChat/blob/master/live-chat-icon.png</iconUrl>
     <description>Livechatinc android widget integration using Xamarin</description>
-    <releaseNotes>See Changelog: https://github.com/abner86/Xamarin.Android.LiveChat/commits/master</releaseNotes>
+    <releaseNotes>See Changelog: https://github.com/MR-Williams-Inc/Xamarin.Android.LiveChat/commits/master</releaseNotes>
     <copyright>Copyright 2018 (c) Abner Benavides. All Rights Reserved.</copyright>
     <language>en-US</language>
     <tags>Xamarin, Android, mobile</tags>
@@ -22,6 +23,6 @@
   <files>
     <!-- Android reference assemblies -->
     <file src="Xamarin.Android.LiveChat\bin\Release\Xamarin.Android.LiveChat.dll" target="lib\MonoAndroid80\Xamarin.Android.LiveChat.dll" />
-    <file src="Xamarin.Android.LiveChat\bin/Release\Xamarin.Android.LiveChat.pdb" target="lib\MonoAndroid80\Xamarin.Android.LiveChat.pdb" />
+    <file src="Xamarin.Android.LiveChat\bin\Release\Xamarin.Android.LiveChat.pdb" target="lib\MonoAndroid80\Xamarin.Android.LiveChat.pdb" />
   </files>
 </package>
