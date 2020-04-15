@@ -357,6 +357,7 @@ namespace Xamarin.Android.LiveChat
                     VerticalScrollBarEnabled = false,
                     HorizontalScrollBarEnabled = false
                 };
+
                 webViewPopup.SetWebViewClient(new LCWebViewClient());
                 webViewPopup.Settings.JavaScriptEnabled = true;
                 webViewPopup.LayoutParameters = new LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent);
@@ -364,10 +365,10 @@ namespace Xamarin.Android.LiveChat
                 {
                     view.AddView(webViewPopup);
                 }
+
                 WebView.WebViewTransport transport = (WebView.WebViewTransport)resultMsg.Obj;
                 transport.WebView = webViewPopup;
                 resultMsg.SendToTarget();
-
                 return true;
             }
 
@@ -444,10 +445,16 @@ namespace Xamarin.Android.LiveChat
                         view.RemoveView(webViewPopup);
                         webViewPopup = null;
                     }
+
                     return false;
                 }
-                if (facebookLogin) { return false; };
-                Intent intent = new Intent(Intent.ActionView);
+
+                if (facebookLogin)
+                {
+                    return false;
+                };
+
+                Intent intent = new Intent(Intent.ActionView, uri);
                 instance.StartActivity(intent);
                 return true;
             }
