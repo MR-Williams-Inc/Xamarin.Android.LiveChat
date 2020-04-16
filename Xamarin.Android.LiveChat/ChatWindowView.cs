@@ -2,6 +2,8 @@
 
 using Java.IO;
 using Java.Lang;
+using Java.Util.Regex;
+using Pattern = Java.Util.Regex.Pattern;
 
 using Android.App;
 using Android.Content;
@@ -30,7 +32,7 @@ namespace Xamarin.Android.LiveChat
         internal static TextView statusText;
         internal static Button reloadButton;
         internal static ProgressBar progressBar;
-        internal IChatWindowEventsListener chatWindowListener;
+        internal static IChatWindowEventsListener chatWindowListener;
         internal static readonly int REQUEST_CODE_FILE_UPLOAD = 21354;
         internal static readonly string TARGET_URL_PREFIX = "secure.livechatinc.com";
 
@@ -341,6 +343,11 @@ namespace Xamarin.Android.LiveChat
             }
         }
 
+        public static bool IsSecureLivechatIncDomain(string host)
+        {
+          return host != null && Pattern.Compile("(secure-?(lc|dal|fra|)\\.(livechat|livechatinc)\\.com)").Matcher(host).Find();
+        }
+
         protected class LCWebChromeClient : WebChromeClient
         {
             private ChatWindowView ChatWindow = null;
@@ -427,36 +434,41 @@ namespace Xamarin.Android.LiveChat
             private bool HandleUri(WebView view, Uri uri)
             {
                 string uriString = uri.ToString();
-                if (uriString.StartsWith("tel:"))
-                {
-                    Intent i = new Intent(Intent.ActionDial, uri);
-                    instance.StartActivity(i);
-                    return true;
-                }
-
-                string host = uri.Host;
                 bool facebookLogin = Regex.IsMatch(uriString, facebookPattern);
-                bool liveChat = Regex.IsMatch(uriString, Pattern);
-                if (host.Equals(TARGET_URL_PREFIX) || liveChat)
-                {
-                    if (webViewPopup != null)
-                    {
-                        webViewPopup.Visibility = ViewStates.Gone;
-                        view.RemoveView(webViewPopup);
-                        webViewPopup = null;
-                    }
-
-                    return false;
-                }
-
                 if (facebookLogin)
                 {
                     return false;
-                };
+                }
+                else
+                {
+                  if (webViewPopup != null)
+                  {
+                      webViewPopup.Visibility = ViewStates.Gone;
+                      view.RemoveView(webViewPopup);
+                      webViewPopup = null;
+                  }
 
-                Intent intent = new Intent(Intent.ActionView, uri);
-                instance.StartActivity(intent);
-                return true;
+                  string originalUrl = webView.OriginalUrl;
+                  if (uriString.Equals(originalUrl) || IsSecureLivechatIncDomain(uri.Host))
+                  {
+                      return false;
+                  }
+                  else
+                  {
+                      if (chatWindowListener != null && chatWindowListener.HandleUri(uri))
+                      {
+
+                      }
+                      else
+                      {
+                          Intent intent = new Intent(Intent.ActionView, uri);
+                          intent.SetFlags(ActivityFlags.NewTask);
+                          instance.StartActivity(intent);
+                      }
+
+                      return true;
+                  }
+                }
             }
         }
     }
