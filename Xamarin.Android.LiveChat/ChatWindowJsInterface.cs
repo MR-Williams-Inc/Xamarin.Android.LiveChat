@@ -17,6 +17,7 @@ namespace Xamarin.Android.LiveChat
         private static readonly string TYPE_HIDE_CHAT_WINDOW = "hideChatWindow";
         private static readonly string TYPE_NEW_MESSAGE = "newMessage";
         public ChatWindowJsInterface(ChatWindowView view) => this.view = view;
+
         [JavascriptInterface]
         public void PostMessage(string messageJson)
         {
@@ -26,7 +27,14 @@ namespace Xamarin.Android.LiveChat
                 JSONObject jsonObject = new JSONObject(messageJson);
                 if (jsonObject != null && jsonObject.Has(KEY_MESSAGE_TYPE))
                 {
-                    DispatchMessage(jsonObject.GetString(KEY_MESSAGE_TYPE), messageJson);
+                    try
+                    {
+                        DispatchMessage(jsonObject.GetString(KEY_MESSAGE_TYPE), messageJson);
+                    }
+                    catch (System.ObjectDisposedException ex)
+                    {
+
+                    }
                 }
             }
             catch (JsonException e)
