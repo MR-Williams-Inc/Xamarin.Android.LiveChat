@@ -71,6 +71,9 @@
     <PackageReference Include="Xamarin.Forms">
       <Version>4.0.0.425677</Version>
     </PackageReference>
+    <PackageReference Include="LiveChat">
+      <Version>1.1.2</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\strings.xml" />
